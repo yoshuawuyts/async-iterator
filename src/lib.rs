@@ -12,7 +12,6 @@
 //! All traits make use of the `async_trait` annotation. In order to implement
 //! the traits, use `async_trait`.
 
-#![feature(type_alias_impl_trait)]
 #![forbid(unsafe_code, future_incompatible, rust_2018_idioms)]
 #![deny(missing_debug_implementations, nonstandard_style)]
 #![warn(missing_docs, unreachable_pub)]
