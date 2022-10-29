@@ -1,32 +1,38 @@
 //! An async version of iterator.
-//! 
+//!
 //! This crate provides the following capabilities:
-//! 
+//!
 //! - The base async `Iterator` trait implemented with `async fn next`
 //! - The ability to `collect` into a `vec`
 //! - The ability to asynchronously `map` over values in the iterator
 //! - The ability to extend `vec` with an async iterator
+//! 
+//! # Minimum Supported Rust Version
+//! 
+//! This code should be considered _unstable_ and only works on recent versions
+//! of nightly.
 //!
 //! # Trait definitions
 //!
 //! All traits make use of the `async_trait` annotation. In order to implement
 //! the traits, use `async_trait`.
-
-#![forbid(unsafe_code, future_incompatible, rust_2018_idioms)]
+//!
+#![feature(return_position_impl_trait_in_trait)]
+#![feature(async_fn_in_trait)]
+#![forbid(unsafe_code, future_incompatible)]
 #![deny(missing_debug_implementations, nonstandard_style)]
 #![warn(missing_docs, unreachable_pub)]
 
 /// `async-trait` re-export
-pub use async_trait::async_trait;
 use std::future::Future;
 
 /// The `async-iterator` prelude
 pub mod prelude {
-    pub use super::{IntoIterator, Iterator, FromIterator, Extend};
+    pub use super::{Extend, FromIterator, IntoIterator, Iterator};
 }
 
 /// An interface for dealing with iterators.
-#[async_trait(?Send)]
+
 #[must_use = "iterators are lazy and do nothing unless consumed"]
 pub trait Iterator {
     /// The type of the elements being iterated over.
@@ -44,26 +50,24 @@ pub trait Iterator {
     fn map<B, F>(self, f: F) -> Map<Self, F>
     where
         Self: Sized,
-        F: FnMut(Self::Item) -> B
+        F: FnMut(Self::Item) -> B,
     {
-        Map {
-            stream: self,
-            f,
-        }
+        Map { stream: self, f }
     }
 
     /// Transforms an iterator into a collection.
-    #[must_use = "if you really need to exhaust the iterator, consider `.for_each(drop)` instead"]
+    // #[must_use = "if you really need to exhaust the iterator, consider `.for_each(drop)` instead"]
     async fn collect<B: FromIterator<Self::Item>>(self) -> B
     where
         Self: Sized,
     {
-        FromIterator::from_iter(self).await
+        let fut = <B as FromIterator<_>>::from_iter(self);
+        fut.await
     }
 }
 
 /// Conversion into an [`Iterator`].
-#[async_trait(?Send)]
+
 pub trait IntoIterator {
     /// The type of the elements being iterated over.
     type Item;
@@ -75,7 +79,6 @@ pub trait IntoIterator {
     async fn into_iter(self) -> Self::IntoIter;
 }
 
-#[async_trait(?Send)]
 impl<I: Iterator> IntoIterator for I {
     type Item = I::Item;
     type IntoIter = I;
@@ -86,15 +89,13 @@ impl<I: Iterator> IntoIterator for I {
 }
 
 /// Conversion from an [`Iterator`].
-#[async_trait(?Send)]
+
 pub trait FromIterator<A>: Sized {
     /// Creates a value from an iterator.
     async fn from_iter<T: IntoIterator<Item = A>>(iter: T) -> Self;
 }
 
-#[async_trait(?Send)]
 impl<T> FromIterator<T> for Vec<T> {
-    #[inline]
     async fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Vec<T> {
         let mut iter = iter.into_iter().await;
         let mut output = Vec::with_capacity(iter.size_hint().1.unwrap_or_default());
@@ -106,15 +107,13 @@ impl<T> FromIterator<T> for Vec<T> {
 }
 
 /// Extend a collection with the contents of an iterator.
-#[async_trait(?Send)]
+
 pub trait Extend<A> {
     /// Extends a collection with the contents of an iterator.
     async fn extend<T: IntoIterator<Item = A>>(&mut self, iter: T);
 }
 
-#[async_trait(?Send)]
 impl<T> Extend<T> for Vec<T> {
-    #[inline]
     async fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I) {
         let mut iter = iter.into_iter().await;
         self.reserve(iter.size_hint().1.unwrap_or_default());
@@ -131,7 +130,6 @@ pub struct Map<I, F> {
     f: F,
 }
 
-#[async_trait(?Send)]
 impl<I, F, B, Fut> Iterator for Map<I, F>
 where
     I: Iterator,

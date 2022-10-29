@@ -16,6 +16,5 @@ authors = [
 [features]
 
 [dependencies]
-async-trait = "0.1.57"
 
 [dev-dependencies]
