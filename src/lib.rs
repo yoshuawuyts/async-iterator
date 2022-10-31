@@ -144,3 +144,15 @@ where
         Some(out)
     }
 }
+
+#[cfg(test)]
+mod test {
+    pub use super::*;
+
+    #[test]
+    fn smoke() {
+        async fn foo(iter: impl Iterator<Item = u32>) {
+            let v: Vec<_> = iter.collect().await;
+        }
+    }
+}
