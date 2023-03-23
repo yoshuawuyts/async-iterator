@@ -16,5 +16,6 @@ authors = [
 [features]
 
 [dependencies]
+pin-project = "1.0.12"
 
 [dev-dependencies]
