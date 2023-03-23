@@ -6,9 +6,9 @@
 //! - The ability to `collect` into a `vec`
 //! - The ability to asynchronously `map` over values in the iterator
 //! - The ability to extend `vec` with an async iterator
-//! 
+//!
 //! # Minimum Supported Rust Version
-//! 
+//!
 //! This code should be considered _unstable_ and only works on recent versions
 //! of nightly.
 //!
@@ -16,7 +16,7 @@
 //!
 //! All traits make use of the `async_trait` annotation. In order to implement
 //! the traits, use `async_trait`.
-//!
+#![allow(incomplete_features)]
 #![feature(return_position_impl_trait_in_trait)]
 #![feature(async_fn_in_trait)]
 #![forbid(unsafe_code, future_incompatible)]
@@ -147,10 +147,11 @@ where
 
 #[cfg(test)]
 mod test {
-    pub use super::*;
+    use super::*;
 
     #[test]
     fn smoke() {
+        #[allow(unused)]
         async fn foo(iter: impl Iterator<Item = u32>) {
             let v: Vec<_> = iter.collect().await;
         }

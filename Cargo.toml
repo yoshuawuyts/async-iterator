@@ -16,5 +16,8 @@ authors = [
 [features]
 
 [dependencies]
+futures = "0.3.27"
+futures-core = "0.3.27"
+pin-project = "1.0.12"
 
 [dev-dependencies]
