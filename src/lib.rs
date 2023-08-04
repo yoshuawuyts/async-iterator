@@ -17,6 +17,7 @@
 //! All traits make use of the `async_trait` annotation. In order to implement
 //! the traits, use `async_trait`.
 //!
+#![cfg_attr(not(feature = "std"), no_std)]
 #![allow(incomplete_features)]
 #![feature(return_position_impl_trait_in_trait)]
 #![feature(async_fn_in_trait)]
@@ -25,7 +26,7 @@
 #![warn(missing_docs)]
 
 /// `async-trait` re-export
-use std::future::Future;
+use core::future::Future;
 
 /// The `async-iterator` prelude
 pub mod prelude {
@@ -96,10 +97,14 @@ pub trait FromIterator<A>: Sized {
     async fn from_iter<T: IntoIterator<Item = A>>(iter: T) -> Self;
 }
 
-impl<T> FromIterator<T> for Vec<T> {
-    async fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Vec<T> {
+#[cfg(feature = "alloc")]
+extern crate alloc as std;
+
+#[cfg(any(feature = "alloc", feature = "std"))]
+impl<T> FromIterator<T> for std::vec::Vec<T> {
+    async fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> std::vec::Vec<T> {
         let mut iter = iter.into_iter().await;
-        let mut output = Vec::with_capacity(iter.size_hint().1.unwrap_or_default());
+        let mut output = std::vec::Vec::with_capacity(iter.size_hint().1.unwrap_or_default());
         while let Some(item) = iter.next().await {
             output.push(item);
         }
@@ -114,7 +119,8 @@ pub trait Extend<A> {
     async fn extend<T: IntoIterator<Item = A>>(&mut self, iter: T);
 }
 
-impl<T> Extend<T> for Vec<T> {
+#[cfg(any(feature = "alloc", feature = "std"))]
+impl<T> Extend<T> for std::vec::Vec<T> {
     async fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I) {
         let mut iter = iter.into_iter().await;
         self.reserve(iter.size_hint().1.unwrap_or_default());
