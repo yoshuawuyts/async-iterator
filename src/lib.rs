@@ -25,6 +25,9 @@
 #![deny(missing_debug_implementations, nonstandard_style)]
 #![warn(missing_docs)]
 
+mod lending;
+pub use lending::LendingIterator;
+
 /// `async-trait` re-export
 use core::future::Future;
 
