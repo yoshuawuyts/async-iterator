@@ -20,9 +20,12 @@
 #![allow(incomplete_features)]
 #![feature(return_position_impl_trait_in_trait)]
 #![feature(async_fn_in_trait)]
+#![feature(impl_trait_projections)]
 #![forbid(unsafe_code, future_incompatible)]
 #![deny(missing_debug_implementations, nonstandard_style)]
 #![warn(missing_docs)]
+
+pub mod concurrent;
 
 /// `async-trait` re-export
 use std::future::Future;
@@ -68,7 +71,6 @@ pub trait Iterator {
 }
 
 /// Conversion into an [`Iterator`].
-
 pub trait IntoIterator {
     /// The type of the elements being iterated over.
     type Item;
