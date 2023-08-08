@@ -2,6 +2,8 @@ mod lend;
 mod lend_mut;
 mod map;
 
+pub use lend::Lend;
+pub use lend_mut::LendMut;
 pub use map::Map;
 
 use crate::FromIterator;
@@ -39,5 +41,25 @@ pub trait Iterator {
     {
         let fut = <B as crate::FromIterator<_>>::from_iter(self);
         fut.await
+    }
+
+    /// Creates an iterator which yields a reference to `self` as well as
+    /// the next value.
+    #[must_use = "iterators do nothing unless iterated over"]
+    fn lend(self) -> Lend<Self>
+    where
+        Self: Sized,
+    {
+        Lend::new(self)
+    }
+
+    /// Creates an iterator which yields a mutable reference to `self` as well
+    /// as the next value.
+    #[must_use = "iterators do nothing unless iterated over"]
+    fn lend_mut(self) -> LendMut<Self>
+    where
+        Self: Sized,
+    {
+        LendMut::new(self)
     }
 }

@@ -25,6 +25,8 @@
 #![deny(missing_debug_implementations, nonstandard_style)]
 #![warn(missing_docs)]
 
+mod extend;
+mod from_iterator;
 mod into_iterator;
 mod iter;
 mod lending_iter;
@@ -33,7 +35,7 @@ pub use from_iterator::FromIterator;
 pub use into_iterator::IntoIterator;
 pub use lending_iter::LendingIterator;
 
-pub use iter::{Iterator, Map};
+pub use iter::{Iterator, Lend, LendMut, Map};
 
 /// The `async-iterator` prelude
 pub mod prelude {
