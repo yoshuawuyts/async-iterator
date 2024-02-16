@@ -1,7 +1,9 @@
+mod filter;
 mod lend;
 mod lend_mut;
 mod map;
 
+pub use filter::Filter;
 pub use lend::Lend;
 pub use lend_mut::LendMut;
 pub use map::Map;
@@ -31,6 +33,17 @@ pub trait Iterator {
         F: FnMut(Self::Item) -> B,
     {
         Map::new(self, f)
+    }
+
+    /// Creates an iterator which uses a closure to determine if an element should be yielded.
+    #[must_use = "iterators do nothing unless iterated over"]
+    fn filter<P>(self, predicate: P) -> Filter<Self, P>
+    where
+        P: async FnMut(&Self::Item) -> bool,
+        // P: FnMut(&Self::Item) -> bool,
+        Self: Sized,
+    {
+        Filter::new(self, predicate)
     }
 
     /// Transforms an iterator into a collection.
