@@ -42,10 +42,7 @@ where
     I: crate::Iterator,
     P: async FnMut(&I::Item) -> bool,
 {
-    pub(crate) fn new(stream: I, predicate: P) -> Self {
-        Self {
-            iter: stream,
-            predicate,
-        }
+    pub(crate) fn new(iter: I, predicate: P) -> Self {
+        Self { iter, predicate }
     }
 }
