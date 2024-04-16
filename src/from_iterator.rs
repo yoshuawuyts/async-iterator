@@ -1,4 +1,6 @@
 use crate::IntoIterator;
+
+#[cfg(any(feature = "alloc", feature = "std"))]
 use crate::Iterator;
 
 /// Conversion from an [`Iterator`].

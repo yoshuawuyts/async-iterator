@@ -45,7 +45,7 @@ pub mod prelude {
 #[cfg(feature = "alloc")]
 extern crate alloc as std;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "alloc"))]
 mod test {
     pub use super::*;
 
